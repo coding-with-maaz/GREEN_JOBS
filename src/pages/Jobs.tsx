@@ -6,7 +6,7 @@ import SearchBar from '@/components/jobs/SearchBar';
 import JobCard from '@/components/jobs/JobCard';
 import CategoryFilter from '@/components/jobs/CategoryFilter';
 import FadeIn from '@/components/ui/FadeIn';
-import { Brief, Briefcase, Filter } from 'lucide-react';
+import { Briefcase, Filter } from 'lucide-react';
 
 // Mock job data
 const mockJobs = [
@@ -72,11 +72,20 @@ const mockJobs = [
   },
 ];
 
+// Mock categories for CategoryFilter component
+const mockCategories = [
+  { _id: 'Technology', name: 'Technology', icon: 'computer', color: '#10B981', count: 15 },
+  { _id: 'Marketing', name: 'Marketing', icon: 'trending-up', color: '#6366F1', count: 8 },
+  { _id: 'Design', name: 'Design', icon: 'pen-tool', color: '#F59E0B', count: 12 },
+  { _id: 'Finance', name: 'Finance', icon: 'dollar-sign', color: '#3B82F6', count: 6 }
+];
+
 const Jobs = () => {
   const [jobs, setJobs] = useState(mockJobs);
   const [filteredJobs, setFilteredJobs] = useState(mockJobs);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   // In a real app, we would fetch jobs here
   useEffect(() => {
@@ -103,7 +112,9 @@ const Jobs = () => {
     setFilteredJobs(filtered);
   };
 
-  const handleCategoryFilter = (categoryId: string) => {
+  const handleCategoryFilter = (categoryId: string | null) => {
+    setSelectedCategory(categoryId);
+    
     if (!categoryId) {
       setFilteredJobs(jobs);
       return;
@@ -151,7 +162,11 @@ const Jobs = () => {
               <div className={`${isFilterOpen ? 'block' : 'hidden'} md:block`}>
                 <div className="bg-white rounded-xl border border-border p-6 mb-6">
                   <h2 className="font-semibold mb-4">Job Categories</h2>
-                  <CategoryFilter onCategorySelect={handleCategoryFilter} />
+                  <CategoryFilter 
+                    categories={mockCategories}
+                    selectedCategory={selectedCategory}
+                    onSelectCategory={handleCategoryFilter}
+                  />
                 </div>
               </div>
             </div>
