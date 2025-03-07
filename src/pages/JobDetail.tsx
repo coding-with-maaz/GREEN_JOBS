@@ -29,7 +29,7 @@ You will collaborate closely with our design and backend teams to deliver high-q
     'Experience with state management libraries like Redux or Vuex',
     'Familiarity with modern build tools and workflows',
     'Excellent communication and teamwork skills',
-    'Bachelor's degree in Computer Science or related field (or equivalent experience)'
+    'Bachelor\'s degree in Computer Science or related field (or equivalent experience)'
   ],
   applicationUrl: 'https://example.com/apply',
   category: {
