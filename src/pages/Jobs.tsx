@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -5,7 +6,7 @@ import SearchBar from '@/components/jobs/SearchBar';
 import JobCard from '@/components/jobs/JobCard';
 import CategoryFilter from '@/components/jobs/CategoryFilter';
 import FadeIn from '@/components/ui/FadeIn';
-import { Briefcase, Filter, Calendar, TrendingUp, Check } from 'lucide-react';
+import { Briefcase, Filter, Calendar, TrendingUp, Check, MapPin, XCircle } from 'lucide-react';
 
 // Mock job data
 const mockJobs = [
@@ -79,6 +80,22 @@ const mockCategories = [
   { _id: 'Finance', name: 'Finance', icon: 'dollar-sign', color: '#10B981', count: 6 }
 ];
 
+// Job types with icons and colors
+const jobTypes = [
+  { id: 'fulltime', label: 'Full-time', color: 'bg-blue-100 text-blue-800' },
+  { id: 'parttime', label: 'Part-time', color: 'bg-purple-100 text-purple-800' },
+  { id: 'contract', label: 'Contract', color: 'bg-amber-100 text-amber-800' },
+  { id: 'internship', label: 'Internship', color: 'bg-green-100 text-green-800' },
+];
+
+// Experience levels
+const experienceLevels = [
+  { id: 'entry', label: 'Entry Level' },
+  { id: 'mid', label: 'Mid Level' },
+  { id: 'senior', label: 'Senior Level' },
+  { id: 'executive', label: 'Executive' },
+];
+
 const Jobs = () => {
   const [jobs, setJobs] = useState(mockJobs);
   const [filteredJobs, setFilteredJobs] = useState(mockJobs);
@@ -86,6 +103,8 @@ const Jobs = () => {
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('recent');
+  const [selectedJobTypes, setSelectedJobTypes] = useState<string[]>([]);
+  const [selectedExpLevels, setSelectedExpLevels] = useState<string[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -98,28 +117,80 @@ const Jobs = () => {
 
   const handleSearch = (searchTerm: string) => {
     if (!searchTerm.trim()) {
-      setFilteredJobs(jobs);
+      applyFilters();
       return;
     }
     
-    const filtered = jobs.filter(job => 
+    const searchResults = jobs.filter(job => 
       job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.location.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    setFilteredJobs(filtered);
+    
+    applyFilters(searchResults);
   };
 
   const handleCategoryFilter = (categoryId: string | null) => {
     setSelectedCategory(categoryId);
+    applyFilters(undefined, categoryId);
+  };
+
+  const handleJobTypeToggle = (typeId: string) => {
+    setSelectedJobTypes(prev => {
+      if (prev.includes(typeId)) {
+        return prev.filter(id => id !== typeId);
+      } else {
+        return [...prev, typeId];
+      }
+    });
+  };
+
+  const handleExpLevelToggle = (levelId: string) => {
+    setSelectedExpLevels(prev => {
+      if (prev.includes(levelId)) {
+        return prev.filter(id => id !== levelId);
+      } else {
+        return [...prev, levelId];
+      }
+    });
+  };
+
+  const applyFilters = (baseJobs = jobs, category = selectedCategory) => {
+    let results = [...baseJobs];
     
-    if (!categoryId) {
-      setFilteredJobs(jobs);
-      return;
+    // Apply category filter
+    if (category) {
+      results = results.filter(job => job.category.name.toLowerCase() === category.toLowerCase());
     }
     
-    const filtered = jobs.filter(job => job.category.name.toLowerCase() === categoryId.toLowerCase());
-    setFilteredJobs(filtered);
+    // Apply job type filters
+    if (selectedJobTypes.length > 0) {
+      results = results.filter(job => selectedJobTypes.includes(job.type));
+    }
+    
+    // Sort results
+    switch(sortBy) {
+      case 'salary-high':
+        results.sort((a, b) => {
+          const aValue = parseInt(a.salary.replace(/[^0-9]/g, ''));
+          const bValue = parseInt(b.salary.replace(/[^0-9]/g, ''));
+          return bValue - aValue;
+        });
+        break;
+      case 'salary-low':
+        results.sort((a, b) => {
+          const aValue = parseInt(a.salary.replace(/[^0-9]/g, ''));
+          const bValue = parseInt(b.salary.replace(/[^0-9]/g, ''));
+          return aValue - bValue;
+        });
+        break;
+      case 'recent':
+      default:
+        results.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        break;
+    }
+    
+    setFilteredJobs(results);
   };
 
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -152,37 +223,50 @@ const Jobs = () => {
     setFilteredJobs(sortedJobs);
   };
 
+  const clearAllFilters = () => {
+    setSelectedCategory(null);
+    setSelectedJobTypes([]);
+    setSelectedExpLevels([]);
+    setFilteredJobs(jobs);
+  };
+
+  useEffect(() => {
+    applyFilters();
+  }, [selectedJobTypes, selectedExpLevels]);
+
+  const hasActiveFilters = selectedCategory || selectedJobTypes.length > 0 || selectedExpLevels.length > 0;
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 py-16">
-        <div className="container-custom">
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 py-12 md:py-16">
+        <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl">
           <FadeIn>
-            <h1 className="text-3xl md:text-4xl font-bold text-center mb-2">Find Your Dream Job</h1>
-            <p className="text-center text-muted-foreground mt-4 max-w-2xl mx-auto">
+            <h1 className="text-3xl md:text-4xl font-bold text-center mb-3">Find Your Dream Job</h1>
+            <p className="text-center text-muted-foreground mt-4 max-w-2xl mx-auto mb-8">
               Browse through thousands of job listings to find the perfect position that matches your skills and career goals.
             </p>
-            <div className="mt-8 max-w-3xl mx-auto">
-              <SearchBar onSearch={handleSearch} />
+            <div className="mt-8 max-w-4xl mx-auto">
+              <SearchBar onSearch={handleSearch} className="shadow-md" />
             </div>
             
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
               {mockCategories.map(category => (
                 <button 
                   key={category._id}
                   onClick={() => handleCategoryFilter(category._id === selectedCategory ? null : category._id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full transition-all ${
                     selectedCategory === category._id 
                       ? 'bg-primary text-white shadow-md' 
-                      : 'bg-white hover:bg-gray-50 border border-gray-200'
+                      : 'bg-white hover:bg-gray-50 border border-gray-200 shadow-sm'
                   }`}
                 >
                   <span 
                     className="inline-block w-3 h-3 rounded-full" 
                     style={{ backgroundColor: category.color }}
                   />
-                  <span>{category.name}</span>
+                  <span className="font-medium">{category.name}</span>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-opacity-20"
                     style={{ 
                       backgroundColor: selectedCategory === category._id ? 'rgba(255,255,255,0.3)' : category.color,
@@ -199,11 +283,12 @@ const Jobs = () => {
         </div>
       </div>
       
-      <main className="flex-1 container-custom py-10">
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="md:w-1/4">
-            <div className="sticky top-24">
-              <div className="md:hidden mb-4">
+      <main className="flex-1 container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl py-8 md:py-10">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          {/* Sidebar Filters */}
+          <div className="lg:w-1/4 w-full">
+            <div className="lg:sticky lg:top-24">
+              <div className="lg:hidden mb-4">
                 <button 
                   className="w-full flex items-center justify-between p-3 bg-white rounded-lg border border-border shadow-sm"
                   onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -216,73 +301,124 @@ const Jobs = () => {
                 </button>
               </div>
               
-              <div className={`${isFilterOpen ? 'block' : 'hidden'} md:block space-y-6`}>
-                <div className="bg-white rounded-xl border border-border shadow-sm p-6">
-                  <h2 className="font-semibold text-lg mb-4">Job Categories</h2>
-                  <CategoryFilter 
-                    categories={mockCategories}
-                    selectedCategory={selectedCategory}
-                    onSelectCategory={handleCategoryFilter}
-                  />
-                </div>
-                
-                <div className="bg-white rounded-xl border border-border shadow-sm p-6">
-                  <h2 className="font-semibold text-lg mb-4">Job Type</h2>
-                  <div className="space-y-3">
-                    {['Full-time', 'Part-time', 'Contract', 'Internship'].map((type) => (
-                      <div key={type} className="flex items-center">
-                        <input 
-                          type="checkbox" 
-                          id={type.toLowerCase()} 
-                          className="rounded border-gray-300 text-primary focus:ring-primary"
-                        />
-                        <label htmlFor={type.toLowerCase()} className="ml-2 text-sm text-gray-700">
-                          {type}
-                        </label>
-                      </div>
-                    ))}
+              <div className={`${isFilterOpen ? 'block' : 'hidden'} lg:block space-y-6`}>
+                <div className="bg-white rounded-xl border border-border shadow-sm p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="font-semibold text-lg">Filters</h2>
+                    {hasActiveFilters && (
+                      <button 
+                        onClick={clearAllFilters}
+                        className="text-sm text-primary hover:text-primary/80 flex items-center"
+                      >
+                        <XCircle className="h-3.5 w-3.5 mr-1" />
+                        Clear all
+                      </button>
+                    )}
                   </div>
-                </div>
-                
-                <div className="bg-white rounded-xl border border-border shadow-sm p-6">
-                  <h2 className="font-semibold text-lg mb-4">Experience Level</h2>
-                  <div className="space-y-3">
-                    {['Entry Level', 'Mid Level', 'Senior Level', 'Executive'].map((level) => (
-                      <div key={level} className="flex items-center">
-                        <input 
-                          type="checkbox" 
-                          id={level.toLowerCase().replace(' ', '-')} 
-                          className="rounded border-gray-300 text-primary focus:ring-primary"
-                        />
-                        <label 
-                          htmlFor={level.toLowerCase().replace(' ', '-')} 
-                          className="ml-2 text-sm text-gray-700"
-                        >
-                          {level}
-                        </label>
+                  
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="font-medium text-base mb-3">Category</h3>
+                      <CategoryFilter 
+                        categories={mockCategories}
+                        selectedCategory={selectedCategory}
+                        onSelectCategory={handleCategoryFilter}
+                      />
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-medium text-base mb-3">Job Type</h3>
+                      <div className="space-y-2.5">
+                        {jobTypes.map((type) => (
+                          <div key={type.id} className="flex items-center">
+                            <input 
+                              type="checkbox" 
+                              id={type.id} 
+                              checked={selectedJobTypes.includes(type.id)}
+                              onChange={() => handleJobTypeToggle(type.id)}
+                              className="rounded border-gray-300 text-primary focus:ring-primary"
+                            />
+                            <label htmlFor={type.id} className="ml-2 text-sm text-gray-700 flex items-center">
+                              {type.label}
+                              <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${type.color}`}>
+                                {mockJobs.filter(job => job.type === type.id).length}
+                              </span>
+                            </label>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-medium text-base mb-3">Experience Level</h3>
+                      <div className="space-y-2.5">
+                        {experienceLevels.map((level) => (
+                          <div key={level.id} className="flex items-center">
+                            <input 
+                              type="checkbox" 
+                              id={level.id} 
+                              checked={selectedExpLevels.includes(level.id)}
+                              onChange={() => handleExpLevelToggle(level.id)}
+                              className="rounded border-gray-300 text-primary focus:ring-primary"
+                            />
+                            <label 
+                              htmlFor={level.id} 
+                              className="ml-2 text-sm text-gray-700"
+                            >
+                              {level.label}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-medium text-base mb-3">Location</h3>
+                      <div className="space-y-3">
+                        <div className="relative">
+                          <MapPin className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                          <input
+                            type="text"
+                            placeholder="Enter location..."
+                            className="w-full pl-10 pr-3 py-2 border border-border/60 rounded-md text-sm focus:border-primary focus:ring-1 focus:ring-primary"
+                          />
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="remote-only"
+                            className="rounded border-gray-300 text-primary focus:ring-primary"
+                          />
+                          <label htmlFor="remote-only" className="ml-2 text-sm text-gray-700">
+                            Remote Only
+                          </label>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
           
-          <div className="md:w-3/4">
+          {/* Job Listings Area */}
+          <div className="lg:w-3/4 w-full">
             {loading ? (
               <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="animate-pulse">
-                    <div className="h-32 bg-muted rounded-xl"></div>
+                    <div className="h-36 bg-muted rounded-xl"></div>
                   </div>
                 ))}
               </div>
             ) : (
               <>
-                <div className="mb-6 flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-border/60">
-                  <p className="text-muted-foreground flex items-center">
-                    <Briefcase className="h-4 w-4 mr-2 text-primary" />
-                    Found <span className="font-medium text-foreground mx-1">{filteredJobs.length}</span> jobs
+                <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-lg shadow-sm border border-border/60">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-muted-foreground flex items-center text-sm sm:text-base">
+                      <Briefcase className="h-4 w-4 mr-2 text-primary" />
+                      <span>Found <span className="font-medium text-foreground mx-1">{filteredJobs.length}</span> jobs</span>
+                    </p>
                     {selectedCategory && (
                       <span className="ml-2 flex items-center text-sm bg-primary/10 text-primary px-2 py-0.5 rounded-full">
                         {mockCategories.find(c => c._id === selectedCategory)?.name}
@@ -294,9 +430,20 @@ const Jobs = () => {
                         </button>
                       </span>
                     )}
-                  </p>
-                  <div className="flex items-center">
-                    <label htmlFor="sort-by" className="text-sm text-muted-foreground mr-2">Sort by:</label>
+                    {selectedJobTypes.map(typeId => (
+                      <span key={typeId} className="flex items-center text-sm bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                        {jobTypes.find(t => t.id === typeId)?.label}
+                        <button
+                          onClick={() => handleJobTypeToggle(typeId)}
+                          className="ml-1 rounded-full hover:bg-blue-200 p-0.5"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex items-center self-end sm:self-auto">
+                    <label htmlFor="sort-by" className="text-sm text-muted-foreground mr-2 whitespace-nowrap">Sort by:</label>
                     <select 
                       id="sort-by"
                       value={sortBy}
@@ -310,7 +457,7 @@ const Jobs = () => {
                   </div>
                 </div>
                 
-                <div className="space-y-4">
+                <div className="grid gap-5">
                   {filteredJobs.length > 0 ? (
                     filteredJobs.map((job, index) => (
                       <FadeIn key={job._id} delay={index * 50}>
@@ -318,20 +465,17 @@ const Jobs = () => {
                       </FadeIn>
                     ))
                   ) : (
-                    <div className="text-center py-20 bg-white rounded-xl border border-border shadow-sm">
+                    <div className="text-center py-16 bg-white rounded-xl border border-border shadow-sm">
                       <Briefcase className="h-12 w-12 mx-auto text-muted-foreground" />
                       <h3 className="mt-4 text-lg font-medium">No jobs found</h3>
                       <p className="mt-2 text-muted-foreground">
                         Try changing your search or filter criteria
                       </p>
                       <button
-                        onClick={() => {
-                          setSelectedCategory(null);
-                          setFilteredJobs(jobs);
-                        }}
-                        className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90"
+                        onClick={clearAllFilters}
+                        className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary/90"
                       >
-                        Clear filters
+                        Clear all filters
                       </button>
                     </div>
                   )}
