@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import Jobs from "./pages/Jobs";
+import SearchResults from "./pages/SearchResults";
 import Categories from "./pages/Categories";
 import About from "./pages/About";
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/job/:id" element={<JobDetail />} />
           <Route path="/jobs" element={<Jobs />} />
+          <Route path="/search" element={<SearchResults />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />

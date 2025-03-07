@@ -68,10 +68,10 @@ const JobDetailView = ({ job }: JobDetailProps) => {
         <FadeIn>
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold">{job.title}</h1>
-              <div className="flex items-center mt-2 text-muted-foreground">
+              <h1 className="text-2xl font-bold text-slate-800">{job.title}</h1>
+              <div className="flex items-center mt-2 text-slate-600">
                 <Building className="h-4 w-4 mr-1.5" />
-                <span>{job.company}</span>
+                <span className="font-medium">{job.company}</span>
               </div>
             </div>
             <div className="flex space-x-3">
@@ -97,7 +97,7 @@ const JobDetailView = ({ job }: JobDetailProps) => {
                 href={job.applicationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary py-2.5 px-4"
+                className="btn btn-primary py-2.5 px-5 rounded-lg shadow-sm hover:shadow"
               >
                 Apply Now
               </a>
@@ -110,49 +110,49 @@ const JobDetailView = ({ job }: JobDetailProps) => {
             <div className="flex items-center p-4 bg-secondary rounded-lg">
               <MapPin className="h-5 w-5 text-primary mr-3" />
               <div>
-                <div className="text-xs text-muted-foreground">Location</div>
-                <div className="font-medium">{job.location}</div>
+                <div className="text-xs text-slate-500 uppercase tracking-wide">Location</div>
+                <div className="font-medium text-slate-700">{job.location}</div>
               </div>
             </div>
             <div className="flex items-center p-4 bg-secondary rounded-lg">
               <Briefcase className="h-5 w-5 text-primary mr-3" />
               <div>
-                <div className="text-xs text-muted-foreground">Salary</div>
-                <div className="font-medium">{job.salary}</div>
+                <div className="text-xs text-slate-500 uppercase tracking-wide">Salary</div>
+                <div className="font-medium text-slate-700">{job.salary}</div>
               </div>
             </div>
             <div className="flex items-center p-4 bg-secondary rounded-lg">
               <Calendar className="h-5 w-5 text-primary mr-3" />
               <div>
-                <div className="text-xs text-muted-foreground">Posted On</div>
-                <div className="font-medium">{formatDate(job.date)}</div>
+                <div className="text-xs text-slate-500 uppercase tracking-wide">Posted On</div>
+                <div className="font-medium text-slate-700">{formatDate(job.date)}</div>
               </div>
             </div>
           </div>
         </FadeIn>
 
         <FadeIn delay={200}>
-          <div className="mt-8">
+          <div className="mt-10">
             <div className="flex items-center mb-4">
-              <h2 className="text-lg font-semibold">Job Description</h2>
+              <h2 className="text-xl font-semibold text-slate-800">Job Description</h2>
               <span className={`ml-3 text-xs rounded-full px-3 py-1 font-medium ${getTypeColor(job.type)}`}>
                 {job.type.charAt(0).toUpperCase() + job.type.slice(1)}
               </span>
             </div>
-            <div className="prose prose-green max-w-none">
-              <p className="text-muted-foreground whitespace-pre-line">{job.description}</p>
+            <div className="prose prose-slate max-w-none">
+              <p className="text-slate-600 leading-relaxed text-base whitespace-pre-line">{job.description}</p>
             </div>
           </div>
         </FadeIn>
 
         <FadeIn delay={300}>
-          <div className="mt-8">
-            <h2 className="text-lg font-semibold mb-4">Requirements</h2>
-            <ul className="space-y-2">
+          <div className="mt-10">
+            <h2 className="text-xl font-semibold mb-5 text-slate-800">Requirements</h2>
+            <ul className="space-y-3 pl-1">
               {job.requirements.map((requirement, index) => (
                 <li key={index} className="flex items-start">
-                  <span className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5 mr-2.5"></span>
-                  <span className="text-muted-foreground">{requirement}</span>
+                  <span className="h-2 w-2 rounded-full bg-primary mt-2 mr-3"></span>
+                  <span className="text-slate-600 leading-relaxed">{requirement}</span>
                 </li>
               ))}
             </ul>
@@ -160,7 +160,7 @@ const JobDetailView = ({ job }: JobDetailProps) => {
         </FadeIn>
 
         <FadeIn delay={400}>
-          <div className="mt-8 pt-6 border-t border-border">
+          <div className="mt-10 pt-6 border-t border-border">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <span className="chip chip-secondary">{job.category.name}</span>
@@ -169,7 +169,7 @@ const JobDetailView = ({ job }: JobDetailProps) => {
                 href={job.applicationUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary py-2.5 px-4 flex items-center justify-center"
+                className="btn btn-primary py-2.5 px-5 flex items-center justify-center rounded-lg shadow-sm hover:shadow"
               >
                 Apply For This Position
                 <ExternalLink className="h-4 w-4 ml-2" />

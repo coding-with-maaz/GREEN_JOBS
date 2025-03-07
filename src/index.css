@@ -45,6 +45,15 @@
     @apply bg-background text-foreground antialiased;
   }
 
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight;
+  }
+
+  p, li {
+    @apply text-slate-600 leading-relaxed;
+  }
+
   /* Glass effect */
   .glass {
     @apply bg-white/50 backdrop-blur-lg border border-white/30 shadow-sm rounded-2xl;
@@ -103,10 +112,44 @@
   }
 
   .section-heading {
-    @apply text-2xl font-semibold tracking-tight;
+    @apply text-2xl font-semibold tracking-tight text-slate-800;
   }
 
   .container-custom {
     @apply px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto;
+  }
+
+  /* Search and filter styles */
+  .search-input {
+    @apply w-full p-4 pl-12 rounded-xl border border-border/60 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm hover:shadow-md;
+  }
+
+  .filter-checkbox {
+    @apply rounded border-gray-300 text-primary focus:ring-primary transition-colors;
+  }
+
+  /* Job detail styles */
+  .job-detail-section {
+    @apply mt-10;
+  }
+
+  .job-detail-heading {
+    @apply text-xl font-semibold mb-5 text-slate-800;
+  }
+
+  .job-requirements-list {
+    @apply space-y-3 pl-1;
+  }
+
+  .job-requirement-item {
+    @apply flex items-start;
+  }
+
+  .job-requirement-bullet {
+    @apply h-2 w-2 rounded-full bg-primary mt-2 mr-3;
+  }
+
+  .job-requirement-text {
+    @apply text-slate-600 leading-relaxed;
   }
 }

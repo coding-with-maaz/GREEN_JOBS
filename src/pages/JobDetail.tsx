@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Clock, MapPin, Calendar } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, Calendar, Briefcase } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import JobDetailView from '@/components/jobs/JobDetailView';
@@ -124,7 +124,7 @@ const JobDetail = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <div className="bg-gradient-to-r from-green-50 to-green-100 py-10">
+      <div className="bg-gradient-to-r from-green-50 to-blue-50 py-12">
         <div className="container-custom">
           <FadeIn>
             <Link 
@@ -134,17 +134,17 @@ const JobDetail = () => {
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back to all jobs
             </Link>
-            <h1 className="text-3xl md:text-4xl font-bold">{job.title}</h1>
-            <div className="flex flex-wrap gap-4 mt-4">
-              <div className="flex items-center text-muted-foreground">
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-800">{job.title}</h1>
+            <div className="flex flex-wrap gap-5 mt-4">
+              <div className="flex items-center text-slate-600">
                 <MapPin className="h-4 w-4 mr-1.5" />
                 {job.location}
               </div>
-              <div className="flex items-center text-muted-foreground">
+              <div className="flex items-center text-slate-600">
                 <Clock className="h-4 w-4 mr-1.5" />
                 {job.type.charAt(0).toUpperCase() + job.type.slice(1)}
               </div>
-              <div className="flex items-center text-muted-foreground">
+              <div className="flex items-center text-slate-600">
                 <Calendar className="h-4 w-4 mr-1.5" />
                 Posted {new Date(job.date).toLocaleDateString()}
               </div>
@@ -160,7 +160,7 @@ const JobDetail = () => {
         
         <FadeIn delay={200}>
           <div className="mt-16">
-            <h2 className="section-heading mb-6">Similar Jobs</h2>
+            <h2 className="text-2xl font-bold text-slate-800 mb-6">Similar Jobs</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {similarJobs.map((similarJob) => (
                 <Link 
@@ -168,10 +168,13 @@ const JobDetail = () => {
                   to={`/job/${similarJob._id}`}
                   className="block p-6 bg-white rounded-xl border border-border/60 hover:shadow-md transition-shadow hover:border-primary/20"
                 >
-                  <h3 className="font-semibold text-lg">{similarJob.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{similarJob.company}</p>
+                  <h3 className="font-semibold text-lg text-slate-800">{similarJob.title}</h3>
+                  <p className="text-sm text-slate-500 mt-1">{similarJob.company}</p>
                   <div className="mt-4 flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">{similarJob.location}</span>
+                    <span className="text-sm text-slate-600 flex items-center">
+                      <Briefcase className="h-3.5 w-3.5 mr-1 text-slate-400" />
+                      {similarJob.location}
+                    </span>
                     <span className="text-sm text-primary font-medium">{similarJob.salary}</span>
                   </div>
                 </Link>
