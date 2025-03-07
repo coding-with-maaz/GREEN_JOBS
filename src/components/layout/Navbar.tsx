@@ -1,14 +1,19 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Search, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
   };
 
   return (
@@ -25,28 +30,55 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
-          <Link to="/" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link 
+            to="/" 
+            className={cn(
+              "text-sm font-medium transition-colors",
+              isActive('/') ? "text-primary" : "hover:text-primary"
+            )}
+          >
             Home
           </Link>
-          <Link to="/jobs" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link 
+            to="/jobs" 
+            className={cn(
+              "text-sm font-medium transition-colors",
+              isActive('/jobs') ? "text-primary" : "hover:text-primary"
+            )}
+          >
             Find Jobs
           </Link>
-          <Link to="/categories" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link 
+            to="/categories" 
+            className={cn(
+              "text-sm font-medium transition-colors",
+              isActive('/categories') ? "text-primary" : "hover:text-primary"
+            )}
+          >
             Categories
           </Link>
-          <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">
+          <Link 
+            to="/about" 
+            className={cn(
+              "text-sm font-medium transition-colors",
+              isActive('/about') ? "text-primary" : "hover:text-primary"
+            )}
+          >
             About
           </Link>
         </nav>
 
         {/* Desktop Right Actions */}
         <div className="hidden md:flex items-center space-x-4">
-          <Link to="/search">
-            <Search className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
+          <Link to="/search" className="relative group">
+            <Search className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
           </Link>
           <Link 
             to="/login" 
-            className="text-sm font-medium hover:text-primary transition-colors"
+            className={cn(
+              "text-sm font-medium transition-colors",
+              isActive('/login') ? "text-primary" : "hover:text-primary"
+            )}
           >
             Sign In
           </Link>
@@ -83,28 +115,40 @@ const Navbar = () => {
           <nav className="flex flex-col space-y-4">
             <Link 
               to="/" 
-              className="text-base font-medium hover:text-primary"
+              className={cn(
+                "text-base font-medium",
+                isActive('/') ? "text-primary" : "hover:text-primary"
+              )}
               onClick={() => setIsMenuOpen(false)}
             >
               Home
             </Link>
             <Link 
               to="/jobs" 
-              className="text-base font-medium hover:text-primary"
+              className={cn(
+                "text-base font-medium",
+                isActive('/jobs') ? "text-primary" : "hover:text-primary"
+              )}
               onClick={() => setIsMenuOpen(false)}
             >
               Find Jobs
             </Link>
             <Link 
               to="/categories" 
-              className="text-base font-medium hover:text-primary"
+              className={cn(
+                "text-base font-medium",
+                isActive('/categories') ? "text-primary" : "hover:text-primary"
+              )}
               onClick={() => setIsMenuOpen(false)}
             >
               Categories
             </Link>
             <Link 
               to="/about" 
-              className="text-base font-medium hover:text-primary"
+              className={cn(
+                "text-base font-medium",
+                isActive('/about') ? "text-primary" : "hover:text-primary"
+              )}
               onClick={() => setIsMenuOpen(false)}
             >
               About
