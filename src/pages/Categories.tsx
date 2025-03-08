@@ -1,10 +1,20 @@
-
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Briefcase, Users, Code, Palette, LightbulbIcon, Building, Stethoscope, Landmark, GraduationCap, Map } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Code, LightbulbIcon, Palette, Landmark, Stethoscope, GraduationCap, Building, Users, Map, Briefcase } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import Container from '@/components/ui/Container';
 import FadeIn from '@/components/ui/FadeIn';
+import { cn } from '@/lib/utils';
+
+// Define the Category interface
+interface Category {
+  _id: string;
+  name: string;
+  icon: any;
+  color: string;
+  count: number;
+}
 
 // Mock categories data
 const mockCategories = [
@@ -21,73 +31,93 @@ const mockCategories = [
 ];
 
 const Categories = () => {
-  const [categories, setCategories] = useState(mockCategories);
-  const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>(mockCategories);
+  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
-  // In a real app, we would fetch categories here
-  useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      setCategories(mockCategories);
-      setLoading(false);
-    }, 500);
-  }, []);
+  // Filter categories based on search term
+  const filteredCategories = categories.filter(
+    category => category.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleCategoryClick = (categoryId: string) => {
+    navigate(`/jobs?category=${categoryId}`);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
-      <div className="bg-gradient-to-r from-green-50 to-green-100 py-10">
-        <div className="container-custom">
-          <FadeIn>
-            <h1 className="text-3xl md:text-4xl font-bold text-center">Browse Job Categories</h1>
-            <p className="text-center text-muted-foreground mt-4 max-w-2xl mx-auto">
-              Explore jobs by category to find opportunities that match your expertise and interests.
-            </p>
-          </FadeIn>
-        </div>
-      </div>
-      
-      <main className="flex-1 container-custom py-16">
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="animate-pulse">
-                <div className="h-48 bg-muted rounded-xl"></div>
+      <main className="flex-1 pt-16">
+        <section className="py-12 md:py-16">
+          <Container>
+            <FadeIn>
+              <h1 className="text-3xl md:text-4xl font-bold mb-6">Browse Job Categories</h1>
+              <p className="text-muted-foreground mb-10 max-w-2xl">
+                Explore job opportunities by category. Find the perfect role that matches your skills and interests.
+              </p>
+              
+              <div className="mb-8">
+                <input
+                  type="text"
+                  placeholder="Search categories..."
+                  className="w-full md:w-1/2 px-4 py-2.5 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {categories.map((category, index) => {
-              const IconComponent = category.icon;
-              return (
-                <FadeIn key={category._id} delay={index * 50}>
-                  <Link 
-                    to={`/jobs?category=${category._id}`}
-                    className="flex flex-col p-6 bg-white rounded-xl border border-border hover:shadow-md hover:border-primary/20 transition-all h-full"
-                  >
-                    <div 
-                      className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-                      style={{ backgroundColor: `${category.color}20` }}
-                    >
-                      <IconComponent className="h-8 w-8" style={{ color: category.color }} />
-                    </div>
-                    <h2 className="text-xl font-semibold">{category.name}</h2>
-                    <p className="text-sm text-muted-foreground mt-2 mb-4">
-                      {category.count} Jobs Available
-                    </p>
-                    <div className="mt-auto">
-                      <span className="text-primary text-sm font-medium flex items-center">
-                        Browse Jobs
-                      </span>
-                    </div>
-                  </Link>
-                </FadeIn>
-              );
-            })}
-          </div>
-        )}
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {filteredCategories.map((category, index) => {
+                  const IconComponent = category.icon;
+                  return (
+                    <FadeIn key={category._id} delay={index * 50}>
+                      <div
+                        onClick={() => handleCategoryClick(category._id)}
+                        className={cn(
+                          "relative overflow-hidden p-6 rounded-xl border border-border/60 cursor-pointer transition-all",
+                          "hover:shadow-lg hover:border-primary/30 hover:scale-[1.02] hover:-translate-y-1",
+                          "flex flex-col items-center text-center h-full"
+                        )}
+                      >
+                        {/* Background pattern */}
+                        <div
+                          className="absolute inset-0 z-0 opacity-[0.03]"
+                          style={{
+                            backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M0 0h1v1H0V0zm20 0h1v1h-1V0zM0 20h1v1H0v-1zm20 0h1v1h-1v-1z'/%3E%3C/g%3E%3C/svg%3E\")"
+                          }}
+                        ></div>
+                        
+                        <div
+                          className="w-16 h-16 rounded-full flex items-center justify-center mb-4 z-10"
+                          style={{ backgroundColor: `${category.color}15` }}
+                        >
+                          <IconComponent className="h-7 w-7" style={{ color: category.color }} />
+                        </div>
+                        
+                        <h3 className="text-xl font-semibold mb-2 z-10">{category.name}</h3>
+                        <p className="text-muted-foreground z-10">{category.count} Jobs Available</p>
+                        
+                        {/* Bottom line accent */}
+                        <div
+                          className="absolute bottom-0 left-0 h-1 w-full"
+                          style={{ backgroundColor: category.color }}
+                        ></div>
+                      </div>
+                    </FadeIn>
+                  );
+                })}
+              </div>
+              
+              {filteredCategories.length === 0 && (
+                <div className="text-center py-12">
+                  <h3 className="text-xl font-medium">No categories found</h3>
+                  <p className="text-muted-foreground mt-2">Try a different search term</p>
+                </div>
+              )}
+            </FadeIn>
+          </Container>
+        </section>
       </main>
       
       <Footer />

@@ -13,29 +13,34 @@ import Jobs from "./pages/Jobs";
 import SearchResults from "./pages/SearchResults";
 import Categories from "./pages/Categories";
 import About from "./pages/About";
+import ForgotPassword from "./pages/ForgotPassword";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/job/:id" element={<JobDetail />} />
-          <Route path="/jobs" element={<Jobs />} />
-          <Route path="/search" element={<SearchResults />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/job/:id" element={<JobDetail />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/jobs" element={<Jobs />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </TooltipProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 

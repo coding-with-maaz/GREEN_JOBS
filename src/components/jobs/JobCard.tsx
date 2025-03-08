@@ -1,101 +1,109 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { MapPin, Calendar, Briefcase } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-import { Link } from 'react-router-dom';
-import { Calendar, MapPin, Briefcase, ExternalLink } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+interface JobCategory {
+  name: string;
+  color: string;
+  icon: string;
+}
+
+interface Job {
+  _id: string;
+  title: string;
+  company: string;
+  location: string;
+  type: string;
+  salary: string;
+  date: string;
+  category: JobCategory;
+}
 
 interface JobCardProps {
-  job: {
-    _id: string;
-    title: string;
-    company: string;
-    location: string;
-    type: string;
-    salary: string;
-    date: string;
-    category: {
-      name: string;
-      color: string;
-      icon: string;
-    };
-  };
+  job: Job;
   className?: string;
 }
 
 const JobCard = ({ job, className }: JobCardProps) => {
-  const typeColors = {
-    fulltime: 'bg-blue-100 text-blue-800',
-    parttime: 'bg-purple-100 text-purple-800',
-    contract: 'bg-amber-100 text-amber-800',
-    internship: 'bg-green-100 text-green-800',
-  };
-
-  const getTypeColor = (type: string) => {
-    return typeColors[type as keyof typeof typeColors] || 'bg-gray-100 text-gray-800';
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return format(date, 'MMM dd, yyyy');
+  const [isHovered, setIsHovered] = useState(false);
+  
+  const formattedDate = new Date(job.date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+  
+  const jobTypes: Record<string, string> = {
+    fulltime: "Full-time",
+    parttime: "Part-time",
+    contract: "Contract",
+    temporary: "Temporary",
+    internship: "Internship",
+    remote: "Remote",
   };
 
   return (
-    <div 
+    <Link
+      to={`/job/${job._id}`}
       className={cn(
-        "bg-white rounded-xl border border-border/60 p-6 card-hover",
+        "block bg-white rounded-xl overflow-hidden border border-border/60 transition-all duration-300",
+        "hover:shadow-lg hover:border-primary/30 hover:translate-y-[-2px]",
         className
       )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex items-start justify-between">
-        <div>
-          <Link 
-            to={`/job/${job._id}`}
-            className="text-lg font-semibold line-clamp-1 hover:text-primary transition-colors"
-          >
-            {job.title}
-          </Link>
-          <div className="text-muted-foreground text-sm mt-1">{job.company}</div>
+      <div className="p-6">
+        <div className="flex justify-between">
+          <div>
+            <span 
+              className="inline-flex items-center text-xs px-2.5 py-0.5 font-medium rounded-full" 
+              style={{ 
+                backgroundColor: `${job.category.color}15`, 
+                color: job.category.color 
+              }}
+            >
+              {job.category.name}
+            </span>
+          </div>
+          <div className="text-sm text-primary font-medium">{job.salary}</div>
         </div>
-        <div className="flex">
-          <span 
-            className={cn(
-              "text-xs rounded-full px-3 py-1 font-medium",
-              getTypeColor(job.type)
-            )}
-          >
-            {job.type.charAt(0).toUpperCase() + job.type.slice(1)}
-          </span>
+        
+        <h2 className={cn(
+          "mt-3 text-xl font-semibold text-foreground transition-colors duration-300",
+          isHovered && "text-primary"
+        )}>
+          {job.title}
+        </h2>
+        
+        <p className="mt-1 text-sm text-muted-foreground mb-4">
+          {job.company}
+        </p>
+        
+        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center">
+            <MapPin className="h-4 w-4 mr-1.5 text-muted-foreground/70" />
+            {job.location}
+          </div>
+          
+          <div className="flex items-center">
+            <Briefcase className="h-4 w-4 mr-1.5 text-muted-foreground/70" />
+            {jobTypes[job.type] || job.type}
+          </div>
+          
+          <div className="flex items-center">
+            <Calendar className="h-4 w-4 mr-1.5 text-muted-foreground/70" />
+            Posted {formattedDate}
+          </div>
         </div>
       </div>
-
-      <div className="mt-4 flex flex-wrap gap-3">
-        <div className="flex items-center text-sm text-muted-foreground">
-          <MapPin className="h-4 w-4 mr-1.5 text-muted-foreground/70" />
-          {job.location}
-        </div>
-        <div className="flex items-center text-sm text-muted-foreground">
-          <Briefcase className="h-4 w-4 mr-1.5 text-muted-foreground/70" />
-          {job.salary}
-        </div>
-        <div className="flex items-center text-sm text-muted-foreground">
-          <Calendar className="h-4 w-4 mr-1.5 text-muted-foreground/70" />
-          {formatDate(job.date)}
-        </div>
-      </div>
-
-      <div className="mt-5 pt-4 border-t border-border/60 flex items-center justify-between">
-        <div className="chip chip-secondary">
-          {job.category.name}
-        </div>
-        <Link 
-          to={`/job/${job._id}`}
-          className="flex items-center text-sm font-medium text-primary hover:underline"
-        >
-          View Details
-          <ExternalLink className="h-3.5 w-3.5 ml-1.5" />
-        </Link>
-      </div>
-    </div>
+      
+      <div className={cn(
+        "h-1.5 bg-primary origin-left scale-x-0 transition-transform duration-300",
+        isHovered && "scale-x-100"
+      )} />
+    </Link>
   );
 };
 

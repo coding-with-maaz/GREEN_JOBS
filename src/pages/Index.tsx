@@ -7,6 +7,9 @@ import Footer from '@/components/layout/Footer';
 import SearchBar from '@/components/jobs/SearchBar';
 import JobCard from '@/components/jobs/JobCard';
 import FadeIn from '@/components/ui/FadeIn';
+import Container from '@/components/ui/Container';
+import CategoryCard from '@/components/categories/CategoryCard';
+import { useNavigate } from 'react-router-dom';
 
 // Mock data for initial render
 const mockCategories = [
@@ -62,6 +65,7 @@ const mockJobs = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
   const [featuredJobs, setFeaturedJobs] = useState(mockJobs);
   const [categories, setCategories] = useState(mockCategories);
   
@@ -84,6 +88,10 @@ const Index = () => {
     //
     // fetchData();
   }, []);
+
+  const handleCategoryClick = (categoryId: string) => {
+    navigate(`/jobs?category=${categoryId}`);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -121,43 +129,35 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Categories Section */}
-        <section className="py-16 md:py-20">
-          <div className="container-custom">
+       {/* Categories Section */}
+       <section className="py-16 md:py-24">
+          <Container>
             <FadeIn>
               <div className="flex justify-between items-center mb-10">
                 <h2 className="section-heading">Browse by Category</h2>
-                <Link to="/categories" className="text-primary font-medium text-sm flex items-center hover:underline">
+                <Link 
+                  to="/categories" 
+                  className="text-primary font-medium text-sm flex items-center hover:underline"
+                >
                   View All Categories
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </Link>
               </div>
             </FadeIn>
             
-            <FadeIn delay={100}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6">
-                {categories.map((category) => (
-                  <Link 
-                    key={category._id}
-                    to={`/jobs?category=${category._id}`}
-                    className="flex flex-col items-center p-6 bg-white rounded-xl border border-border/60 text-center hover:shadow-md hover:border-primary/20 transition-all"
-                  >
-                    <div 
-                      className="w-14 h-14 rounded-full flex items-center justify-center mb-4"
-                      style={{ backgroundColor: `${category.color}20` }}
-                    >
-                      <Briefcase className="h-6 w-6" style={{ color: category.color }} />
-                    </div>
-                    <h3 className="font-medium">{category.name}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {category.count} Jobs Available
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </FadeIn>
-          </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-6">
+              {categories.map((category, index) => (
+                <FadeIn key={category._id} delay={index * 50}>
+                  <CategoryCard 
+                    category={category} 
+                    onClick={handleCategoryClick} 
+                  />
+                </FadeIn>
+              ))}
+            </div>
+          </Container>
         </section>
+        
         
         {/* Featured Jobs Section */}
         <section className="py-16 md:py-20 bg-secondary/50">

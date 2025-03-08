@@ -1,54 +1,120 @@
-
-import { useState, FormEvent } from 'react';
-import { Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { Search, MapPin, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SearchBarProps {
   defaultValue?: string;
-  placeholder?: string;
+  defaultLocation?: string;
+  onSearch?: (query: string, location?: string) => void;
   className?: string;
-  onSearch?: (query: string) => void;
 }
 
-const SearchBar = ({
-  defaultValue = '',
-  placeholder = 'Search jobs, companies, or keywords...',
-  className = '',
-  onSearch
+const SearchBar = ({ 
+  defaultValue = "", 
+  defaultLocation = "",
+  onSearch, 
+  className 
 }: SearchBarProps) => {
-  const [searchQuery, setSearchQuery] = useState(defaultValue);
+  const [query, setQuery] = useState(defaultValue);
+  const [location, setLocation] = useState(defaultLocation);
+  const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: FormEvent) => {
+  useEffect(() => {
+    setQuery(defaultValue);
+  }, [defaultValue]);
+
+  useEffect(() => {
+    setLocation(defaultLocation);
+  }, [defaultLocation]);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      if (onSearch) {
-        onSearch(searchQuery.trim());
-      } else {
-        navigate(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
-      }
+    
+    if (onSearch) {
+      onSearch(query, location);
+    } else {
+      // Build query parameters for navigation
+      const params = new URLSearchParams();
+      if (query) params.set('query', query);
+      if (location) params.set('location', location);
+      
+      navigate(`/search?${params.toString()}`);
     }
   };
 
+  const clearSearch = () => {
+    setQuery("");
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  const clearLocation = () => {
+    setLocation("");
+  };
+
   return (
-    <form onSubmit={handleSubmit} className={`relative w-full ${className}`}>
-      <div className="relative group">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-          <Search className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+    <form 
+      onSubmit={handleSubmit}
+      className={cn(
+        "bg-white rounded-2xl overflow-hidden border border-border/60 transition-all",
+        "hover:shadow-md focus-within:shadow-md focus-within:border-primary/30",
+        className
+      )}
+    >
+      <div className="flex flex-col md:flex-row">
+        <div className="flex-1 flex items-center relative border-b md:border-b-0 md:border-r border-border/60">
+          <div className="pl-4">
+            <Search className="h-5 w-5 text-muted-foreground" />
+          </div>
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Job title, keyword, or company"
+            className="flex-1 py-4 px-3 focus:outline-none text-foreground placeholder:text-muted-foreground"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={clearSearch}
+              className="pr-4 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
-        <input
-          type="search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={placeholder}
-          className="w-full p-4 pl-12 rounded-xl border border-border/60 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm hover:shadow-md"
-        />
-        <button
-          type="submit"
-          className="absolute right-3 top-1/2 -translate-y-1/2 btn btn-primary px-5 py-2 text-sm rounded-lg font-medium shadow-sm hover:shadow"
-        >
-          Search
-        </button>
+        
+        <div className="flex-1 md:flex-none md:w-1/3 flex items-center relative">
+          <div className="pl-4">
+            <MapPin className="h-5 w-5 text-muted-foreground" />
+          </div>
+          <input
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="Location (optional)"
+            className="flex-1 py-4 px-3 focus:outline-none text-foreground placeholder:text-muted-foreground"
+          />
+          {location && (
+            <button
+              type="button"
+              onClick={clearLocation}
+              className="text-muted-foreground hover:text-foreground mr-2"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+          <button
+            type="submit"
+            className="h-full px-6 bg-primary text-white font-medium hover:bg-primary/90 transition-colors flex items-center justify-center"
+          >
+            Search
+          </button>
+        </div>
       </div>
     </form>
   );
